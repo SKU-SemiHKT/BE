@@ -2,11 +2,13 @@ services:
   app:
     image: ghcr.io/sku-semihkt/sku-thon-app:latest
     ports:
-      - "8080:8080"
+      - "80:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/skuthon
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
     networks:
       - skuthon-net
     restart: unless-stopped
