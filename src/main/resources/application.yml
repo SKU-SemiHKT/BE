@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: sku-thon
+  profiles:
+    include: secret
+
+cors:
+  allowed-origins: http://localhost:3000
