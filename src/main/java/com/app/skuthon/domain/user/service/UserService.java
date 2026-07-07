@@ -21,4 +21,10 @@ public class UserService {
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    }
+
 }
