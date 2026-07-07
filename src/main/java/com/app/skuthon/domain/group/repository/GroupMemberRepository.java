@@ -21,4 +21,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     // 4. 특정 그룹에 속한 멤버 전체 조회 (그룹 상세 조회 시 멤버 리스트용)
     List<GroupMember> findByTeamGroup(TeamGroup teamGroup);
 
+    // 5. 특정 유저가 해당 그룹에 속해 있는지 확인 (미션 등록 등 멤버 권한 검증용)
+    boolean existsByUserIdAndTeamGroupId(Long userId, Long groupId);
 }
