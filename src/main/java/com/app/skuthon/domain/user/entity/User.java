@@ -34,4 +34,14 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.points = points;
     }
+
+    public void addPoints(int amount) {
+        this.points += amount;
+    }
+
+    public void subtractPoints(int amount) {
+        if (this.points < amount)
+            throw new IllegalStateException("포인트가 부족합니다.");
+        this.points -= amount;
+    }
 }
