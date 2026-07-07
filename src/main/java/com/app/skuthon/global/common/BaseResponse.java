@@ -13,7 +13,7 @@ public class BaseResponse<T> {
   private boolean success;
 
   @Schema(description = "HTTP 상태 코드", example = "200")
-  private Object code;
+  private int code;
 
   @Schema(description = "응답 메시지", example = "요청이 성공적으로 처리 되었습니다.")
   private String message;
@@ -30,7 +30,7 @@ public class BaseResponse<T> {
   public static<T> BaseResponse<T> success(int code, String message, T data) {
     return new BaseResponse<>(true, code, message, data);
   }
-  public static<T> BaseResponse<T> error(String code, String message) {
+  public static<T> BaseResponse<T> error(int code, String message) {
     return new BaseResponse<>(false, code, message, null);
   }
 

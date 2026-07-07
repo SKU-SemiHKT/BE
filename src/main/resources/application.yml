@@ -3,6 +3,13 @@ spring:
     name: sku-thon
   profiles:
     include: secret
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 cors:
   allowed-origins: http://localhost:3000,https://barbelllog.netlify.app
+
+file:
+  upload-dir: /uploads
