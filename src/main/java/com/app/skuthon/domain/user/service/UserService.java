@@ -1,9 +1,9 @@
 package com.app.skuthon.domain.user.service;
 
 import com.app.skuthon.domain.user.entity.User;
-import com.app.skuthon.domain.user.exception.CustomException;
 import com.app.skuthon.domain.user.exception.UserErrorCode;
 import com.app.skuthon.domain.user.repository.UserRepository;
+import com.app.skuthon.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
