@@ -9,7 +9,7 @@ spring:
       max-request-size: 10MB
 
 cors:
-  allowed-origins: http://localhost:3000,https://barbelllog.netlify.app
+  allowed-origins: http://localhost:3000,https://barbelllog.netlify.app, https://api.likelion.store
 
 file:
   upload-dir: /uploads
