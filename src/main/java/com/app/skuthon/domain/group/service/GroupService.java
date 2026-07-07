@@ -11,6 +11,7 @@ import com.app.skuthon.global.exception.CustomException;
 import com.app.skuthon.domain.user.exception.UserErrorCode;
 import com.app.skuthon.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GroupService {
 
     private final TeamGroupRepository teamGroupRepository;

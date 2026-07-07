@@ -19,6 +19,7 @@ import com.app.skuthon.domain.user.repository.UserRepository;
 import com.app.skuthon.global.exception.CustomException;
 import com.app.skuthon.global.util.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProofService {
 
   private static final int PROOF_REWARD_POINT = 30;
