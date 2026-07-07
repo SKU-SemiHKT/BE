@@ -2,15 +2,21 @@ package com.app.skuthon.domain.bet.service;
 
 import com.app.skuthon.domain.bet.dto.request.BetCreateRequest;
 import com.app.skuthon.domain.bet.dto.response.BetResponse;
+import com.app.skuthon.domain.bet.dto.response.MyBetHistoryResponse;
 import com.app.skuthon.domain.bet.entity.Bet;
 import com.app.skuthon.domain.bet.entity.BetStatus;
+import com.app.skuthon.domain.bet.entity.BetType;
 import com.app.skuthon.domain.bet.exception.BetErrorCode;
 import com.app.skuthon.domain.bet.repository.BetRepository;
+import com.app.skuthon.domain.mission.entity.Mission;
+import com.app.skuthon.domain.mission.entity.MissionStatus;
+import com.app.skuthon.domain.mission.repository.MissionRepository;
 import com.app.skuthon.domain.point.entity.ReasonType;
 import com.app.skuthon.domain.point.service.PointService;
 import com.app.skuthon.domain.user.entity.User;
 import com.app.skuthon.domain.user.repository.UserRepository;
 import com.app.skuthon.global.exception.CustomException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +30,7 @@ public class BetService {
   private final BetRepository betRepository;
   private final UserRepository userRepository;
   private final PointService pointService;
+  private final MissionRepository missionRepository;
 
   /** 베팅 걸기 */
   @Transactional
@@ -102,5 +109,62 @@ public class BetService {
       throw new CustomException(BetErrorCode.ALREADY_SETTLED);
     }
     return bet;
+  }
+
+  /** 내 베팅 내역 (최신순) */
+  @Transactional(readOnly = true)
+  public List<MyBetHistoryResponse> getMyBetHistory(Long bettorId) {
+    return betRepository.findByBettorIdOrderByCreatedAtDesc(bettorId).stream()
+        .map(this::toHistoryCard)
+        .toList();
+  }
+
+  private MyBetHistoryResponse toHistoryCard(Bet bet) {
+    // 대상 유저 닉네임
+    String nickname = userRepository.findById(bet.getTargetUserId())
+        .map(User::getNickname).orElse("unknown");
+
+    // 대상의 미션들 → 개수 + 결과 요약
+    List<Mission> missions = missionRepository
+        .findByGroupIdAndUserId(bet.getGroupId(), bet.getTargetUserId());
+    MissionStatus missionResult = missions.stream()
+        .map(Mission::getStatus)
+        .filter(s -> s != MissionStatus.PENDING)
+        .findFirst()
+        .orElse(MissionStatus.PENDING);   // 하나라도 확정이면 그 결과 (일괄 판정이라 전부 동일)
+
+    // 풀/배당률 (그 베팅판 기준)
+    long successPool = betRepository.sumPool(bet.getGroupId(), bet.getTargetUserId(),
+        bet.getBetDate(), BetType.SUCCESS);
+    long failPool = betRepository.sumPool(bet.getGroupId(), bet.getTargetUserId(),
+        bet.getBetDate(), BetType.FAIL);
+    long total = successPool + failPool;                                    // ← 이 줄
+    int successRate = (total == 0) ? 50 : (int) (successPool * 100 / total);  // ← 이 줄
+    // 수익 계산
+    Long profit = switch (bet.getStatus()) {
+      case WIN -> {
+        long winningPool = (bet.getBetType() == BetType.SUCCESS) ? successPool : failPool;
+        long losingPool  = (bet.getBetType() == BetType.SUCCESS) ? failPool : successPool;
+        long dividend = (winningPool == 0) ? 0 : losingPool * bet.getBetAmount() / winningPool;
+        yield bet.getBetAmount() + dividend;
+      }
+      case LOSE -> (long) -bet.getBetAmount();
+      case PENDING -> null;
+    };
+
+    return MyBetHistoryResponse.builder()
+        .betId(bet.getId())
+        .targetNickname(nickname)
+        .missionCount(missions.size())
+        .missionResult(missionResult)
+        .myBetType(bet.getBetType())
+        .myBetAmount(bet.getBetAmount())
+        .betStatus(bet.getStatus())
+        .profit(profit)
+        .successPool(successPool)
+        .failPool(failPool)
+        .successRate(successRate)
+        .failRate(100 - successRate)
+        .build();
   }
 }

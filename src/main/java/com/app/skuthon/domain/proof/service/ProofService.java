@@ -4,6 +4,7 @@ import com.app.skuthon.domain.group.entity.GroupMember;
 import com.app.skuthon.domain.group.entity.TeamGroup;
 import com.app.skuthon.domain.group.repository.GroupMemberRepository;
 import com.app.skuthon.domain.group.repository.TeamGroupRepository;
+import com.app.skuthon.domain.mission.entity.MissionStatus;
 import com.app.skuthon.domain.point.entity.ReasonType;
 import com.app.skuthon.domain.point.service.PointService;
 import com.app.skuthon.domain.proof.dto.response.ProofFeedResponse;
@@ -11,6 +12,7 @@ import com.app.skuthon.domain.proof.dto.response.ProofResponse;
 import com.app.skuthon.domain.proof.entity.DailyProof;
 import com.app.skuthon.domain.proof.exception.ProofErrorCode;
 import com.app.skuthon.domain.proof.repository.DailyProofRepository;
+import com.app.skuthon.domain.settlement.service.SettlementService;
 import com.app.skuthon.domain.user.entity.User;
 import com.app.skuthon.domain.user.exception.UserErrorCode;
 import com.app.skuthon.domain.user.repository.UserRepository;
@@ -40,6 +42,7 @@ public class ProofService {
   private final UserRepository userRepository;
   private final FileStorageService fileStorageService;
   private final PointService pointService;
+  private final SettlementService settlementService;
 
   /** 인증샷 업로드 (하루 1장) + 보상 30P */
   @Transactional
@@ -63,6 +66,8 @@ public class ProofService {
 
     // 인증 보상 +30P
     pointService.addPoints(userId, PROOF_REWARD_POINT, ReasonType.PROOF_REWARD, proof.getId());
+
+    settlementService.settleUser(groupId, userId, MissionStatus.SUCCESS);
 
     int remaining = userRepository.findById(userId).map(User::getPoints).orElse(0);
     return ProofResponse.of(proof, remaining);

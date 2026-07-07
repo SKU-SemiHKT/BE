@@ -2,11 +2,13 @@ package com.app.skuthon.domain.bet.controller;
 
 import com.app.skuthon.domain.bet.dto.request.BetCreateRequest;
 import com.app.skuthon.domain.bet.dto.response.BetResponse;
+import com.app.skuthon.domain.bet.dto.response.MyBetHistoryResponse;
 import com.app.skuthon.domain.bet.service.BetService;
 import com.app.skuthon.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,5 +53,14 @@ public class BetController {
       @RequestBody BetCreateRequest request) {
     return ResponseEntity.ok(BaseResponse.success("베팅이 변경되었습니다.",
         betService.changeBet(betId, request)));
+  }
+
+  @Operation(summary = "내 베팅 내역",
+      description = "내가 건 베팅들의 예측/결과/수익 목록 (최신순). "
+          + "profit — WIN: 원금+배당, LOSE: -베팅액, PENDING: null(진행중)")
+  @GetMapping("/users/{userId}/bets")
+  public ResponseEntity<BaseResponse<List<MyBetHistoryResponse>>> getMyBetHistory(
+      @Parameter(description = "유저 식별자", example = "1") @PathVariable Long userId) {
+    return ResponseEntity.ok(BaseResponse.success(betService.getMyBetHistory(userId)));
   }
 }
