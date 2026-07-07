@@ -13,3 +13,7 @@ cors:
 
 file:
   upload-dir: /uploads
+
+logging:
+  level:
+    org.springframework.web: DEBUG
