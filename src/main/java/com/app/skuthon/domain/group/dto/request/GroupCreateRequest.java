@@ -1,12 +1,24 @@
 package com.app.skuthon.domain.group.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Getter
+@NoArgsConstructor
+@Schema(description = "그룹 생성 요청 DTO")
 public class GroupCreateRequest {
-    private Long userId; // 방장 유저 ID (시연 시 주로 1이 들어옴)
-    private String name; // 그룹명
-    private String mainGoal; // 큰 목표
-    private LocalDate deadline; // 마감 날짜
+
+    @Schema(description = "요청하는 유저의 ID", example = "1")
+    private Long userId;
+
+    @Schema(description = "생성할 그룹의 이름", example = "어제의 나는 죽었다")
+    private String name;
+
+    @Schema(description = "그룹의 메인 목표", example = "11월에 다같이 바프찍기")
+    private String mainGoal;
+
+    @Schema(description = "마감일 (YYYY-MM-DD)", example = "2026-08-30")
+    private LocalDate deadline;
 }
